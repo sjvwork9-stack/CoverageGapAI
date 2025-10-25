@@ -6,76 +6,60 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="space-y-2" [attr.data-testid]="getTestId()">
-      <div class="flex justify-between items-baseline">
-        <span class="text-sm font-medium">{{ label }}</span>
-        <span class="text-sm text-muted-foreground">
-          {{ isSufficient() ? '✓ Adequate' : 'Gap Identified' }}
-        </span>
+    <div class="space-y-2">
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">Current Coverage</span>
+        <span class="font-mono font-medium text-gray-900">{{ formatCurrency(current) }}</span>
       </div>
-
-      <div class="space-y-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-muted-foreground w-20">Current</span>
-          <div class="flex-1 bg-muted rounded-full h-6 relative overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-              [ngClass]="isSufficient() ? 'bg-success' : 'bg-warning'"
-              [style.width.%]="Math.min(getCurrentPercentage(), 100)">
-              <span *ngIf="getCurrentPercentage() > 20" class="text-xs font-medium text-white">
-                {{ currentAmount | currency:'USD':'symbol':'1.0-0' }}
-              </span>
-            </div>
-          </div>
-          <span *ngIf="getCurrentPercentage() <= 20" class="text-xs font-medium w-24 text-right">
-            {{ currentAmount | currency:'USD':'symbol':'1.0-0' }}
-          </span>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-muted-foreground w-20">Target</span>
-          <div class="flex-1 bg-muted rounded-full h-6 relative overflow-hidden">
-            <div
-              class="h-full bg-primary rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-              [style.width.%]="Math.min(getRecommendedPercentage(), 100)">
-              <span *ngIf="getRecommendedPercentage() > 20" class="text-xs font-medium text-primary-foreground">
-                {{ recommendedAmount | currency:'USD':'symbol':'1.0-0' }}
-              </span>
-            </div>
-          </div>
-          <span *ngIf="getRecommendedPercentage() <= 20" class="text-xs font-medium w-24 text-right">
-            {{ recommendedAmount | currency:'USD':'symbol':'1.0-0' }}
-          </span>
+      <div class="relative h-8 bg-gray-200 rounded-full overflow-hidden">
+        <div 
+          class="absolute h-full bg-blue-500 transition-all duration-1000 ease-out flex items-center justify-end pr-2"
+          [style.width.%]="currentPercentage"
+        >
+          @if (currentPercentage > 20) {
+            <span class="text-xs font-medium text-white">{{ currentPercentage.toFixed(0) }}%</span>
+          }
         </div>
       </div>
+
+      <div class="flex justify-between text-sm mt-3">
+        <span class="text-gray-600">Recommended Coverage</span>
+        <span class="font-mono font-medium text-gray-900">{{ formatCurrency(recommended) }}</span>
+      </div>
+      <div class="relative h-8 bg-gray-200 rounded-full overflow-hidden">
+        <div 
+          class="absolute h-full bg-green-500 transition-all duration-1000 ease-out flex items-center justify-end pr-2"
+          style="width: 100%"
+        >
+          <span class="text-xs font-medium text-white">100%</span>
+        </div>
+      </div>
+
+      @if (current < recommended) {
+        <div class="mt-3 text-sm text-orange-700 font-medium">
+          Gap: {{ formatCurrency(recommended - current) }} ({{ ((recommended - current) / recommended * 100).toFixed(1) }}% shortfall)
+        </div>
+      }
     </div>
-  `
+  `,
+  styles: []
 })
 export class ComparisonBarComponent {
-  @Input() label!: string;
-  @Input() currentAmount!: number;
-  @Input() recommendedAmount!: number;
-  @Input() maxAmount?: number;
+  @Input() current: number = 0;
+  @Input() recommended: number = 0;
+  @Input() label: string = '';
 
-  Math = Math;
-
-  getMaxAmount(): number {
-    return this.maxAmount || Math.max(this.currentAmount, this.recommendedAmount) * 1.2;
+  get currentPercentage(): number {
+    if (this.recommended === 0) return 0;
+    return Math.min((this.current / this.recommended) * 100, 100);
   }
 
-  getCurrentPercentage(): number {
-    return (this.currentAmount / this.getMaxAmount()) * 100;
-  }
-
-  getRecommendedPercentage(): number {
-    return (this.recommendedAmount / this.getMaxAmount()) * 100;
-  }
-
-  isSufficient(): boolean {
-    return this.currentAmount >= this.recommendedAmount;
-  }
-
-  getTestId(): string {
-    return 'comparison-' + this.label.toLowerCase().replace(/\s+/g, '-');
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(value);
   }
 }

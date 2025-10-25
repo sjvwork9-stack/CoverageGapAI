@@ -1,115 +1,59 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-coverage-gauge',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule],
   template: `
-    <div class="flex flex-col items-center gap-4">
-      <div [ngClass]="getSizeClass()">
-        <svg class="transform -rotate-90 w-full h-full" data-testid="gauge-svg">
-          <circle
-            cx="50%"
-            cy="50%"
-            [attr.r]="radius"
-            stroke="currentColor"
-            [attr.stroke-width]="strokeWidth"
-            fill="none"
-            class="text-muted"
-          />
-          <circle
-            cx="50%"
-            cy="50%"
-            [attr.r]="radius"
-            stroke="currentColor"
-            [attr.stroke-width]="strokeWidth"
-            fill="none"
-            [attr.stroke-dasharray]="circumference"
-            [attr.stroke-dashoffset]="offset"
-            stroke-linecap="round"
-            [ngClass]="getStatusColor()"
-            class="transition-all duration-1000"
-          />
-        </svg>
-        <div class="absolute inset-0 flex items-center justify-center">
-          <span [ngClass]="[getTextSize(), getStatusColor()]" class="font-semibold" data-testid="gauge-percentage">
-            {{ percentage }}%
-          </span>
+    <div class="relative w-48 h-48">
+      <svg class="w-full h-full transform -rotate-90">
+        <!-- Background circle -->
+        <circle
+          cx="96"
+          cy="96"
+          r="80"
+          stroke="#e5e7eb"
+          stroke-width="12"
+          fill="none"
+        />
+        <!-- Progress circle -->
+        <circle
+          cx="96"
+          cy="96"
+          r="80"
+          [attr.stroke]="getColor()"
+          stroke-width="12"
+          fill="none"
+          stroke-linecap="round"
+          [attr.stroke-dasharray]="circumference"
+          [attr.stroke-dashoffset]="dashOffset"
+          class="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <div class="absolute inset-0 flex flex-col items-center justify-center">
+        <div class="text-4xl font-bold" [style.color]="getColor()" data-testid="text-score">
+          {{ score }}
         </div>
-      </div>
-      <div class="flex items-center gap-2" [ngClass]="getStatusColor()">
-        <mat-icon [ngClass]="getIconSize()">{{ getStatusIcon() }}</mat-icon>
-        <span class="font-medium" data-testid="gauge-status">{{ getStatusLabel() }}</span>
+        <div class="text-sm text-gray-600">Coverage Score</div>
       </div>
     </div>
-  `
+  `,
+  styles: []
 })
 export class CoverageGaugeComponent {
-  @Input() percentage!: number;
-  @Input() size: 'sm' | 'md' | 'lg' = 'md';
+  @Input() score: number = 0;
 
-  get radius(): number {
-    const strokeWidths = { sm: 6, md: 8, lg: 10 };
-    return 50 - strokeWidths[this.size] / 2;
+  circumference = 2 * Math.PI * 80;
+
+  get dashOffset(): number {
+    return this.circumference - (this.score / 100) * this.circumference;
   }
 
-  get strokeWidth(): number {
-    const strokeWidths = { sm: 6, md: 8, lg: 10 };
-    return strokeWidths[this.size];
-  }
-
-  get circumference(): number {
-    return 2 * Math.PI * this.radius;
-  }
-
-  get offset(): number {
-    return this.circumference - (this.percentage / 100) * this.circumference;
-  }
-
-  getSizeClass(): string {
-    const classes = {
-      sm: 'relative w-24 h-24',
-      md: 'relative w-32 h-32',
-      lg: 'relative w-40 h-40'
-    };
-    return classes[this.size];
-  }
-
-  getTextSize(): string {
-    const classes = {
-      sm: 'text-lg',
-      md: 'text-2xl',
-      lg: 'text-3xl'
-    };
-    return classes[this.size];
-  }
-
-  getIconSize(): string {
-    const classes = {
-      sm: 'text-base',
-      md: 'text-xl',
-      lg: 'text-2xl'
-    };
-    return classes[this.size];
-  }
-
-  getStatusColor(): string {
-    if (this.percentage >= 80) return 'text-success';
-    if (this.percentage >= 50) return 'text-warning';
-    return 'text-destructive';
-  }
-
-  getStatusLabel(): string {
-    if (this.percentage >= 80) return 'Adequate';
-    if (this.percentage >= 50) return 'Moderate Risk';
-    return 'Critical Gaps';
-  }
-
-  getStatusIcon(): string {
-    if (this.percentage >= 80) return 'check_circle';
-    if (this.percentage >= 50) return 'warning';
-    return 'cancel';
+  getColor(): string {
+    if (this.score >= 80) return '#10b981'; // green
+    if (this.score >= 60) return '#eab308'; // yellow
+    if (this.score >= 40) return '#f97316'; // orange
+    return '#ef4444'; // red
   }
 }

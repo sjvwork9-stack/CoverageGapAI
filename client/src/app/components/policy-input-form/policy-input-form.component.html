@@ -1,180 +1,223 @@
-<mat-card class="w-full">
-  <mat-card-header>
-    <mat-card-title class="flex items-center gap-2">
-      <mat-icon>home</mat-icon>
-      Policy Information
-    </mat-card-title>
-    <mat-card-subtitle>
-      Enter your current policy details to analyze coverage gaps
-    </mat-card-subtitle>
-  </mat-card-header>
+<div class="bg-white rounded-lg shadow-lg p-6">
+  <h2 class="text-2xl font-semibold text-gray-900 mb-6">Policy Information</h2>
   
-  <mat-card-content>
-    <form [formGroup]="policyForm" (ngSubmit)="onSubmit()" class="space-y-6">
-      <mat-accordion multi>
-        <mat-expansion-panel [expanded]="true" data-testid="accordion-property">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="text-base font-semibold">
-              Property Information
-            </mat-panel-title>
-          </mat-expansion-panel-header>
+  <form (ngSubmit)="analyzePolicy()" #policyForm="ngForm">
+    <!-- Property Information Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Property Information</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Property Address</label>
+          <input
+            type="text"
+            id="address"
+            data-testid="input-address"
+            [(ngModel)]="policyData.propertyAddress"
+            name="address"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="123 Main St, City, State ZIP"
+          />
+        </div>
 
-          <div class="space-y-4 pt-4">
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>Property Address</mat-label>
-              <input matInput formControlName="propertyAddress" 
-                     placeholder="123 Main St, City, State ZIP"
-                     data-testid="input-property-address">
-            </mat-form-field>
+        <div>
+          <label for="propertyType" class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+          <select
+            id="propertyType"
+            data-testid="select-property-type"
+            [(ngModel)]="policyData.propertyType"
+            name="propertyType"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option *ngFor="let type of propertyTypes" [value]="type.value">{{ type.label }}</option>
+          </select>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <mat-form-field appearance="outline">
-                <mat-label>Property Type</mat-label>
-                <mat-select formControlName="propertyType" data-testid="select-property-type">
-                  <mat-option value="single-family">Single Family Home</mat-option>
-                  <mat-option value="condo">Condominium</mat-option>
-                  <mat-option value="townhouse">Townhouse</mat-option>
-                  <mat-option value="rental">Rental Property</mat-option>
-                  <mat-option value="multi-family">Multi-Family</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Construction Year</mat-label>
-                <input matInput type="number" formControlName="constructionYear" 
-                       placeholder="2000"
-                       data-testid="input-construction-year">
-              </mat-form-field>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <mat-form-field appearance="outline">
-                <mat-label>Square Footage</mat-label>
-                <input matInput type="number" formControlName="squareFootage" 
-                       placeholder="2000"
-                       data-testid="input-square-footage">
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Estimated Replacement Cost</mat-label>
-                <input matInput type="number" formControlName="replacementCost" 
-                       placeholder="500000"
-                       data-testid="input-replacement-cost">
-              </mat-form-field>
-            </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="constructionYear" class="block text-sm font-medium text-gray-700 mb-1">Construction Year</label>
+            <input
+              type="number"
+              id="constructionYear"
+              data-testid="input-construction-year"
+              [(ngModel)]="policyData.constructionYear"
+              name="constructionYear"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        </mat-expansion-panel>
 
-        <mat-expansion-panel [expanded]="true" data-testid="accordion-coverage">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="text-base font-semibold">
-              Current Coverage Details
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <div class="space-y-4 pt-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <mat-form-field appearance="outline">
-                <mat-label>Dwelling Coverage (Coverage A)</mat-label>
-                <input matInput type="number" formControlName="dwellingCoverage" 
-                       placeholder="400000"
-                       data-testid="input-dwelling-coverage">
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Personal Property (Coverage C)</mat-label>
-                <input matInput type="number" formControlName="personalPropertyCoverage" 
-                       placeholder="200000"
-                       data-testid="input-personal-property">
-              </mat-form-field>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <mat-form-field appearance="outline">
-                <mat-label>Liability Limit (Coverage E)</mat-label>
-                <mat-select formControlName="liabilityCoverage" data-testid="select-liability">
-                  <mat-option value="100000">$100,000</mat-option>
-                  <mat-option value="300000">$300,000</mat-option>
-                  <mat-option value="500000">$500,000</mat-option>
-                  <mat-option value="1000000">$1,000,000</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Deductible</mat-label>
-                <mat-select formControlName="deductible" data-testid="select-deductible">
-                  <mat-option value="500">$500</mat-option>
-                  <mat-option value="1000">$1,000</mat-option>
-                  <mat-option value="2500">$2,500</mat-option>
-                  <mat-option value="5000">$5,000</mat-option>
-                  <mat-option value="10000">$10,000</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>Loss of Use / ALE (Coverage D)</mat-label>
-              <input matInput type="number" formControlName="lossOfUseCoverage" 
-                     placeholder="80000"
-                     data-testid="input-loss-of-use">
-            </mat-form-field>
-
-            <div class="space-y-4 pt-2">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium">Flood Insurance</div>
-                  <div class="text-sm text-muted-foreground">Separate policy coverage</div>
-                </div>
-                <mat-slide-toggle formControlName="hasFloodCoverage" data-testid="switch-flood">
-                </mat-slide-toggle>
-              </div>
-
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-medium">Earthquake Insurance</div>
-                  <div class="text-sm text-muted-foreground">Additional coverage rider</div>
-                </div>
-                <mat-slide-toggle formControlName="hasEarthquakeCoverage" data-testid="switch-earthquake">
-                </mat-slide-toggle>
-              </div>
-            </div>
+          <div>
+            <label for="squareFootage" class="block text-sm font-medium text-gray-700 mb-1">Square Footage</label>
+            <input
+              type="number"
+              id="squareFootage"
+              data-testid="input-square-footage"
+              [(ngModel)]="policyData.squareFootage"
+              name="squareFootage"
+              required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        </mat-expansion-panel>
+        </div>
 
-        <mat-expansion-panel data-testid="accordion-additional">
-          <mat-expansion-panel-header>
-            <mat-panel-title class="text-base font-semibold">
-              Additional Information
-            </mat-panel-title>
-          </mat-expansion-panel-header>
+        <div>
+          <label for="replacementCost" class="block text-sm font-medium text-gray-700 mb-1">Replacement Cost ($)</label>
+          <input
+            type="number"
+            id="replacementCost"
+            data-testid="input-replacement-cost"
+            [(ngModel)]="policyData.replacementCost"
+            name="replacementCost"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+    </div>
 
-          <div class="space-y-4 pt-4">
-            <mat-form-field class="w-full" appearance="outline">
-              <mat-label>Number of Claims (Last 5 Years)</mat-label>
-              <input matInput type="number" formControlName="claimsLast5Years" 
-                     placeholder="0" min="0"
-                     data-testid="input-claims">
-            </mat-form-field>
+    <!-- Coverage Details Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Current Coverage Details</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="dwellingCoverage" class="block text-sm font-medium text-gray-700 mb-1">Dwelling Coverage ($)</label>
+          <input
+            type="number"
+            id="dwellingCoverage"
+            data-testid="input-dwelling-coverage"
+            [(ngModel)]="policyData.dwellingCoverage"
+            name="dwellingCoverage"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium">Active Mortgage or Lien</div>
-                <div class="text-sm text-muted-foreground">Lender requirements may apply</div>
-              </div>
-              <mat-slide-toggle formControlName="hasMortgage" data-testid="switch-mortgage">
-              </mat-slide-toggle>
-            </div>
+        <div>
+          <label for="personalPropertyCoverage" class="block text-sm font-medium text-gray-700 mb-1">Personal Property Coverage ($)</label>
+          <input
+            type="number"
+            id="personalPropertyCoverage"
+            data-testid="input-personal-property"
+            [(ngModel)]="policyData.personalPropertyCoverage"
+            name="personalPropertyCoverage"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="liabilityCoverage" class="block text-sm font-medium text-gray-700 mb-1">Liability Coverage ($)</label>
+          <input
+            type="number"
+            id="liabilityCoverage"
+            data-testid="input-liability"
+            [(ngModel)]="policyData.liabilityCoverage"
+            name="liabilityCoverage"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="deductible" class="block text-sm font-medium text-gray-700 mb-1">Deductible ($)</label>
+          <input
+            type="number"
+            id="deductible"
+            data-testid="input-deductible"
+            [(ngModel)]="policyData.deductible"
+            name="deductible"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="lossOfUseCoverage" class="block text-sm font-medium text-gray-700 mb-1">Loss of Use Coverage ($)</label>
+          <input
+            type="number"
+            id="lossOfUseCoverage"
+            data-testid="input-loss-of-use"
+            [(ngModel)]="policyData.lossOfUseCoverage"
+            name="lossOfUseCoverage"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="hasFloodCoverage"
+              data-testid="checkbox-flood"
+              [(ngModel)]="policyData.hasFloodCoverage"
+              name="hasFloodCoverage"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label for="hasFloodCoverage" class="ml-2 text-sm text-gray-700">Flood Coverage</label>
           </div>
-        </mat-expansion-panel>
-      </mat-accordion>
 
-      <button mat-raised-button color="primary" type="submit" 
-              class="w-full" 
-              [disabled]="!policyForm.valid"
-              data-testid="button-analyze">
-        <mat-icon>shield</mat-icon>
-        Analyze Coverage
-      </button>
-    </form>
-  </mat-card-content>
-</mat-card>
+          <div class="flex items-center">
+            <input
+              type="checkbox"
+              id="hasEarthquakeCoverage"
+              data-testid="checkbox-earthquake"
+              [(ngModel)]="policyData.hasEarthquakeCoverage"
+              name="hasEarthquakeCoverage"
+              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label for="hasEarthquakeCoverage" class="ml-2 text-sm text-gray-700">Earthquake Coverage</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Context Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Additional Context</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <label for="claimsLast5Years" class="block text-sm font-medium text-gray-700 mb-1">Claims in Last 5 Years</label>
+          <input
+            type="number"
+            id="claimsLast5Years"
+            data-testid="input-claims"
+            [(ngModel)]="policyData.claimsLast5Years"
+            name="claimsLast5Years"
+            required
+            min="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="hasMortgage"
+            data-testid="checkbox-mortgage"
+            [(ngModel)]="policyData.hasMortgage"
+            name="hasMortgage"
+            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label for="hasMortgage" class="ml-2 text-sm text-gray-700">Property has a mortgage</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      data-testid="button-analyze"
+      [disabled]="!policyForm.valid || isAnalyzing"
+      class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-md transition-colors"
+    >
+      <span *ngIf="!isAnalyzing">Analyze Coverage</span>
+      <span *ngIf="isAnalyzing">Analyzing...</span>
+    </button>
+  </form>
+</div>

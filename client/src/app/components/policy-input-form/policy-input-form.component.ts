@@ -1,60 +1,56 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatButtonModule } from '@angular/material/button';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatIconModule } from '@angular/material/icon';
-import { PolicyData } from '../../services/policy-analysis.service';
+import { FormsModule } from '@angular/forms';
+import { PolicyAnalysisService, PolicyData, AnalysisResult } from '../../services/policy-analysis.service';
 
 @Component({
   selector: 'app-policy-input-form',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatSlideToggleModule,
-    MatButtonModule,
-    MatExpansionModule,
-    MatIconModule
-  ],
-  templateUrl: './policy-input-form.component.html'
+  imports: [CommonModule, FormsModule],
+  templateUrl: './policy-input-form.component.html',
+  styles: []
 })
 export class PolicyInputFormComponent {
-  @Output() analyze = new EventEmitter<PolicyData>();
+  @Output() onAnalyze = new EventEmitter<AnalysisResult>();
+  @Input() isAnalyzing = false;
 
-  policyForm: FormGroup;
+  policyData: PolicyData = {
+    propertyAddress: '',
+    propertyType: 'single-family',
+    constructionYear: new Date().getFullYear() - 10,
+    squareFootage: 2000,
+    replacementCost: 350000,
+    dwellingCoverage: 300000,
+    personalPropertyCoverage: 150000,
+    liabilityCoverage: 300000,
+    deductible: 1000,
+    lossOfUseCoverage: 60000,
+    hasFloodCoverage: false,
+    hasEarthquakeCoverage: false,
+    claimsLast5Years: 0,
+    hasMortgage: false
+  };
 
-  constructor(private fb: FormBuilder) {
-    this.policyForm = this.fb.group({
-      propertyAddress: ['', Validators.required],
-      propertyType: ['', Validators.required],
-      constructionYear: ['', [Validators.required, Validators.min(1800)]],
-      squareFootage: ['', [Validators.required, Validators.min(1)]],
-      replacementCost: ['', [Validators.required, Validators.min(1)]],
-      dwellingCoverage: ['', [Validators.required, Validators.min(1)]],
-      personalPropertyCoverage: ['', [Validators.required, Validators.min(0)]],
-      liabilityCoverage: ['', Validators.required],
-      deductible: ['', Validators.required],
-      lossOfUseCoverage: ['', [Validators.required, Validators.min(0)]],
-      hasFloodCoverage: [false],
-      hasEarthquakeCoverage: [false],
-      claimsLast5Years: ['0', [Validators.required, Validators.min(0)]],
-      hasMortgage: [false]
+  propertyTypes = [
+    { value: 'single-family', label: 'Single Family Home' },
+    { value: 'condo', label: 'Condominium' },
+    { value: 'townhouse', label: 'Townhouse' },
+    { value: 'rental', label: 'Rental Property' },
+    { value: 'multi-family', label: 'Multi-Family' }
+  ];
+
+  constructor(private policyAnalysisService: PolicyAnalysisService) {}
+
+  analyzePolicy() {
+    this.isAnalyzing = true;
+    this.policyAnalysisService.analyzePolicy(this.policyData).subscribe({
+      next: (result) => {
+        this.onAnalyze.emit(result);
+      },
+      error: (error) => {
+        console.error('Analysis failed:', error);
+        this.isAnalyzing = false;
+      }
     });
-  }
-
-  onSubmit(): void {
-    if (this.policyForm.valid) {
-      this.analyze.emit(this.policyForm.value as PolicyData);
-    }
   }
 }
