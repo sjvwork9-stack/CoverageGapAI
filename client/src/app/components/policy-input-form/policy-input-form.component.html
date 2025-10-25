@@ -1,0 +1,180 @@
+<mat-card class="w-full">
+  <mat-card-header>
+    <mat-card-title class="flex items-center gap-2">
+      <mat-icon>home</mat-icon>
+      Policy Information
+    </mat-card-title>
+    <mat-card-subtitle>
+      Enter your current policy details to analyze coverage gaps
+    </mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <form [formGroup]="policyForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <mat-accordion multi>
+        <mat-expansion-panel [expanded]="true" data-testid="accordion-property">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-base font-semibold">
+              Property Information
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="space-y-4 pt-4">
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>Property Address</mat-label>
+              <input matInput formControlName="propertyAddress" 
+                     placeholder="123 Main St, City, State ZIP"
+                     data-testid="input-property-address">
+            </mat-form-field>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Property Type</mat-label>
+                <mat-select formControlName="propertyType" data-testid="select-property-type">
+                  <mat-option value="single-family">Single Family Home</mat-option>
+                  <mat-option value="condo">Condominium</mat-option>
+                  <mat-option value="townhouse">Townhouse</mat-option>
+                  <mat-option value="rental">Rental Property</mat-option>
+                  <mat-option value="multi-family">Multi-Family</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Construction Year</mat-label>
+                <input matInput type="number" formControlName="constructionYear" 
+                       placeholder="2000"
+                       data-testid="input-construction-year">
+              </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Square Footage</mat-label>
+                <input matInput type="number" formControlName="squareFootage" 
+                       placeholder="2000"
+                       data-testid="input-square-footage">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Estimated Replacement Cost</mat-label>
+                <input matInput type="number" formControlName="replacementCost" 
+                       placeholder="500000"
+                       data-testid="input-replacement-cost">
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true" data-testid="accordion-coverage">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-base font-semibold">
+              Current Coverage Details
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="space-y-4 pt-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Dwelling Coverage (Coverage A)</mat-label>
+                <input matInput type="number" formControlName="dwellingCoverage" 
+                       placeholder="400000"
+                       data-testid="input-dwelling-coverage">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Personal Property (Coverage C)</mat-label>
+                <input matInput type="number" formControlName="personalPropertyCoverage" 
+                       placeholder="200000"
+                       data-testid="input-personal-property">
+              </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <mat-form-field appearance="outline">
+                <mat-label>Liability Limit (Coverage E)</mat-label>
+                <mat-select formControlName="liabilityCoverage" data-testid="select-liability">
+                  <mat-option value="100000">$100,000</mat-option>
+                  <mat-option value="300000">$300,000</mat-option>
+                  <mat-option value="500000">$500,000</mat-option>
+                  <mat-option value="1000000">$1,000,000</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Deductible</mat-label>
+                <mat-select formControlName="deductible" data-testid="select-deductible">
+                  <mat-option value="500">$500</mat-option>
+                  <mat-option value="1000">$1,000</mat-option>
+                  <mat-option value="2500">$2,500</mat-option>
+                  <mat-option value="5000">$5,000</mat-option>
+                  <mat-option value="10000">$10,000</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>Loss of Use / ALE (Coverage D)</mat-label>
+              <input matInput type="number" formControlName="lossOfUseCoverage" 
+                     placeholder="80000"
+                     data-testid="input-loss-of-use">
+            </mat-form-field>
+
+            <div class="space-y-4 pt-2">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-medium">Flood Insurance</div>
+                  <div class="text-sm text-muted-foreground">Separate policy coverage</div>
+                </div>
+                <mat-slide-toggle formControlName="hasFloodCoverage" data-testid="switch-flood">
+                </mat-slide-toggle>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-medium">Earthquake Insurance</div>
+                  <div class="text-sm text-muted-foreground">Additional coverage rider</div>
+                </div>
+                <mat-slide-toggle formControlName="hasEarthquakeCoverage" data-testid="switch-earthquake">
+                </mat-slide-toggle>
+              </div>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel data-testid="accordion-additional">
+          <mat-expansion-panel-header>
+            <mat-panel-title class="text-base font-semibold">
+              Additional Information
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="space-y-4 pt-4">
+            <mat-form-field class="w-full" appearance="outline">
+              <mat-label>Number of Claims (Last 5 Years)</mat-label>
+              <input matInput type="number" formControlName="claimsLast5Years" 
+                     placeholder="0" min="0"
+                     data-testid="input-claims">
+            </mat-form-field>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium">Active Mortgage or Lien</div>
+                <div class="text-sm text-muted-foreground">Lender requirements may apply</div>
+              </div>
+              <mat-slide-toggle formControlName="hasMortgage" data-testid="switch-mortgage">
+              </mat-slide-toggle>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <button mat-raised-button color="primary" type="submit" 
+              class="w-full" 
+              [disabled]="!policyForm.valid"
+              data-testid="button-analyze">
+        <mat-icon>shield</mat-icon>
+        Analyze Coverage
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>
